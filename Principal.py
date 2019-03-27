@@ -2,11 +2,12 @@ import numpy as np
 import itertools
 import zdt3
 
-class principal:
+
+class Principal:
 
     def __init__(self):
         self.population_size = 30
-        self.generations = 10.000
+        self.generations = 10000
         self.neighborhood_size = 0.2 #Probar con 0.3
         self.sig = 20 #SIG para desviación estandar
         self.pr = 0.5 #Operador de mutación gaussiana
@@ -15,12 +16,11 @@ class principal:
         self.born = False #Para saber si es la primera
         self.population = []
         self.weights = []
-        self.distances = []
+        self.distances = dict()
         self.neighbors = [list() for _ in range(self.population_size)]
-        self.t = 30 #Porcentaje de vecindad ??
+        #self.t = 30 #Porcentaje de vecindad ??
         self.obj = zdt3.zdt3()
         self.best = [np.infty for _ in range(self.obj.number_obj)]
-
 
     def first(self):
         #self.population = [np.random.uniform(0, 1)] generalicemos
@@ -33,7 +33,7 @@ class principal:
         self.distances = {(x, y): np.linalg.norm(self.weights[x]-self.weights[y])
                           for x, y in itertools.product(list(range(len(self.weights))), repeat=2)}
 
-        self.best = [np.min([self.obj.value(individual)[i] for individual in self.population])
+        self.best = [np.min([self.obj.solution(individual)[i] for individual in self.population])
                      for i in range(self.obj.number_obj)]
 
         self.born = True
@@ -41,7 +41,7 @@ class principal:
         self.compute_neighbors()
 
     def process(self):
-        self.birth() #Hemos de iniciar con una primera población y datos
+        self.first() #Hemos de iniciar con una primera población y datos
         for generation in range(self.generations):
             for i in range(self.population_size):
                 if self.reproduce(i) != -1:
@@ -56,7 +56,7 @@ class principal:
                         obj_neighbor = self.evaluate(self.population[j])
                         tchebycheff_neighbor = max([self.weights[j][k] * np.abs(
                             obj_neighbor[k] - self.best[k])
-                                                    for k in range(self.obj.number_obj)])
+                            for k in range(self.obj.number_obj)])
                         if tchebycheff_son <= tchebycheff_neighbor:
                             self.population[j] = self.population[i]
 
@@ -72,14 +72,21 @@ class principal:
 
     #Darle un repaso y comparar operadores geneticos
     def reproduce(self, individual):
-        if (np.random.random() > self.cr):
+        if np.random.random() > self.cr:
             a = self.neighbors[individual]
             parents = np.random.choice(a, 3, replace=False)
             self.weights[individual] = self.weights[parents[0]] + self.f * (
                     self.weights[parents[1]] - self.weights[parents[2]])
             return individual
         return -1
-
+        '''
+        if(np.random.random() > self.pr):
+            father = np.random.randint(0,30)
+            sigma = (self.obj.max_realvar[father] -
+                     self.obj.min_realvar[father]) / self.sig
+            # son = father + N(0, sigma)
+        return None # return son
+        '''
 
     def evaluate(self, individual):
         return self.obj.solution(individual)
