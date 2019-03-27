@@ -11,8 +11,8 @@ class zdt3:
 
 # Creamos la función para obtención de resultados
 
-    def solucion(self, xreal):
-        n=30
+    def solution(self, xreal):
+        n = 30
         tmp = 0
         self.obj[0] = xreal[0]
         for i in range(1,n):
