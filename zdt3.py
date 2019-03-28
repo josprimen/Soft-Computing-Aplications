@@ -19,7 +19,7 @@ class zdt3:
         self.obj[0] = xreal[0]
         for i in range(1, n):
             tmp = tmp + xreal[i]
-        g = 1 + (9/n-1) * tmp
+        g = 1 + (9/(n-1)) * tmp
         h = 1 - math.sqrt(xreal[0]/g) - (xreal[0]/g)*math.sin(10*math.pi*xreal[0])
 
         self.obj[1] = g*h
