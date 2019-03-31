@@ -90,10 +90,10 @@ class Principal:
             print('Tamaño hijo: ')
             print(len(son))'''
             for i in range(len(son)):
-                if son[i] < zdt3.min_realvar[i]:
-                    son[i] = zdt3.min_realvar[i]
-                elif son[i] > zdt3.max_realvar[i]:
-                    son[i] = zdt3.max_realvar[i]
+                if son[i] < self.obj.min_realvar[i]:
+                    son[i] = self.obj.min_realvar[i]
+                elif son[i] > self.obj.max_realvar[i]:
+                    son[i] = self.obj.max_realvar[i]
             self.population[individual] = copy.copy(np.ndarray.tolist(son))
             return individual
         return -1
