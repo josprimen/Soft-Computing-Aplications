@@ -1,7 +1,7 @@
 import numpy as np
 import itertools
 import zdt3
-
+import copy
 
 class Principal:
 
@@ -18,7 +18,6 @@ class Principal:
         self.weights = []
         self.distances = dict()
         self.neighbors = [list() for _ in range(self.population_size)]
-        #self.t = 30 #Porcentaje de vecindad ??
         self.obj = zdt3.zdt3()
         self.best = [np.infty for _ in range(self.obj.number_obj)]
 
@@ -58,7 +57,7 @@ class Principal:
                             obj_neighbor[k] - self.best[k])
                             for k in range(self.obj.number_obj)])
                         if tchebycheff_son <= tchebycheff_neighbor:
-                            self.population[j] = self.population[i]
+                            self.population[j] = copy.copy(self.population[i])
 
     def compute_neighbors(self):
         for i in range(self.population_size):
@@ -72,11 +71,30 @@ class Principal:
 
     #Darle un repaso y comparar operadores geneticos
     def reproduce(self, individual):
+        '''print('El individuo')
+        print(individual)
+        print('Pesos individuo')
+        print(self.weights[individual])'''
         if np.random.random() > self.cr:
             a = self.neighbors[individual]
             parents = np.random.choice(a, 3, replace=False)
-            self.weights[individual] = self.weights[parents[0]] + self.f * (
-                    self.weights[parents[1]] - self.weights[parents[2]])
+            '''print('Padres: ')
+            print(parents)'''
+            #self.weights[individual] = self.weights[parents[0]] + self.f * (
+                    #self.weights[parents[1]] - self.weights[parents[2]])
+            son = np.add(self.population[parents[1]],
+                         self.f * (np.subtract(self.population[parents[1]],
+                                               self.population[parents[2]])))
+            '''print('Hijo: ')
+            print(son)
+            print('Tamaño hijo: ')
+            print(len(son))'''
+            for i in range(len(son)):
+                if son[i] < zdt3.min_realvar[i]:
+                    son[i] = zdt3.min_realvar[i]
+                elif son[i] > zdt3.max_realvar[i]:
+                    son[i] = zdt3.max_realvar[i]
+            self.population[individual] = copy.copy(np.ndarray.tolist(son))
             return individual
         return -1
         '''
