@@ -5,29 +5,36 @@ import copy
 
 class Principal:
 
-    def __init__(self):
-        self.population_size = 30
-        self.generations = 10000
+    def __init__(self, populat=100, generat=100, bol_gen=False):
+        self.population_size = populat
+        self.generations = generat
         self.neighborhood_size = 0.2 #Probar con 0.3
         self.sig = 20 #SIG para desviación estandar
         self.pr = 0.5 #Operador de mutación gaussiana
         self.f = 0.5 #mutación
         self.cr = 0.5 #cruce
         self.born = False #Para saber si es la primera
+        self.end_gen = bol_gen #Se ha acabado con todas las gen?
         self.population = []
         self.weights = []
         self.distances = dict()
         self.neighbors = [list() for _ in range(self.population_size)]
         self.obj = zdt3.zdt3()
         self.best = [np.infty for _ in range(self.obj.number_obj)]
+        self.list_all_gen = [] #Lista con todas las gen
 
     def first(self):
         #self.population = [np.random.uniform(0, 1)] generalicemos
         self.population = [[np.random.uniform(self.obj.min_realvar[i], self.obj.max_realvar[i])
             for i in range(30)] for _ in range(self.population_size)]  #Generalizar el 30?
 
-        self.weights = np.random.dirichlet(
-            np.ones(self.obj.number_obj), self.population_size)
+        #self.weights = np.random.dirichlet(
+         #   np.ones(self.obj.number_obj), self.population_size)
+        #La suma de los componentes de cada vector es 1 y vectores distribuidos uniformemente
+        self.weights = np.asarray(
+            [[(self.population_size-i)/self.population_size,
+              1.-((self.population_size-i)/self.population_size)]
+             for i in range(self.population_size)])
 
         self.distances = {(x, y): np.linalg.norm(self.weights[x]-self.weights[y])
                           for x, y in itertools.product(list(range(len(self.weights))), repeat=2)}
@@ -43,21 +50,27 @@ class Principal:
         self.first() #Hemos de iniciar con una primera población y datos
         for generation in range(self.generations):
             for i in range(self.population_size):
-                if self.reproduce(i) != -1:
-                    obj = self.evaluate(self.population[i])
-                    for j in range(self.obj.number_obj):
+                if self.reproduce(i) != -1: #Reproduccion
+                    obj = self.evaluate(self.population[i]) #Evaluacion
+                    for j in range(self.obj.number_obj): #Actualizar z
                         if self.best[j] > obj[j]:
                             self.best[j] = obj[j]
-                    tchebycheff_son = max([self.weights[i][j] * np.abs(
-                        obj[j] - self.best[j])
-                        for j in range(self.obj.number_obj)])
-                    for j in self.neighbors[i]:
+                    #tchebycheff_son = max([self.weights[i][j] * np.abs(
+                     #   obj[j] - self.best[j])
+                      #  for j in range(self.obj.number_obj)])
+                    for j in self.neighbors[i]: #Actualiza vecinos
                         obj_neighbor = self.evaluate(self.population[j])
+                        tchebycheff_son = max([self.weights[j][k] * np.abs(
+                          obj[k] - self.best[k])
+                          for k in range(self.obj.number_obj)])
                         tchebycheff_neighbor = max([self.weights[j][k] * np.abs(
                             obj_neighbor[k] - self.best[k])
                             for k in range(self.obj.number_obj)])
                         if tchebycheff_son <= tchebycheff_neighbor:
                             self.population[j] = copy.copy(self.population[i])
+            if self.end_gen:
+                for i in range(self.population_size):
+                    self.list_all_gen.append(self.population[i])
 
     def compute_neighbors(self):
         for i in range(self.population_size):
