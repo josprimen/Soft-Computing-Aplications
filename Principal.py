@@ -88,36 +88,30 @@ class Principal:
         print(individual)
         print('Pesos individuo')
         print(self.weights[individual])'''
-        if np.random.random() > self.cr:
-            a = self.neighbors[individual]
-            parents = np.random.choice(a, 3, replace=False)
-            '''print('Padres: ')
-            print(parents)'''
+        #if np.random.random() > self.cr:
+        a = self.neighbors[individual]
+        parents = np.random.choice(a, 3, replace=False)
+        '''print('Padres: ')
+        print(parents)'''
             #self.weights[individual] = self.weights[parents[0]] + self.f * (
                     #self.weights[parents[1]] - self.weights[parents[2]])
-            son = np.add(self.population[parents[1]],
-                         self.f * (np.subtract(self.population[parents[1]],
-                                               self.population[parents[2]])))
-            '''print('Hijo: ')
-            print(son)
-            print('Tamaño hijo: ')
-            print(len(son))'''
-            for i in range(len(son)):
-                if son[i] < self.obj.min_realvar[i]:
-                    son[i] = self.obj.min_realvar[i]
-                elif son[i] > self.obj.max_realvar[i]:
-                    son[i] = self.obj.max_realvar[i]
-            self.population[individual] = copy.copy(np.ndarray.tolist(son))
-            return individual
-        return -1
-        '''
-        if(np.random.random() > self.pr):
-            father = np.random.randint(0,30)
-            sigma = (self.obj.max_realvar[father] -
-                     self.obj.min_realvar[father]) / self.sig
-            # son = father + N(0, sigma)
-        return None # return son
-        '''
+        son = np.add(self.population[parents[0]],
+                     self.f * (np.subtract(self.population[parents[1]],
+                                            self.population[parents[2]])))
+        '''print('Hijo: ')
+        print(son)
+        print('Tamaño hijo: ')
+        print(len(son))'''
+        for i in range(len(son)):
+            if son[i] < self.obj.min_realvar[i]:
+                son[i] = self.obj.min_realvar[i]
+            elif son[i] > self.obj.max_realvar[i]:
+                son[i] = self.obj.max_realvar[i]
+        for i in range(len(son)):
+            if np.random.random() < self.cr:
+                son[i] = self.population[individual][i]
+        self.population[individual] = copy.copy(np.ndarray.tolist(son))
+        return individual
 
     def evaluate(self, individual):
         return self.obj.solution(individual)
