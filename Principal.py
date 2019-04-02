@@ -18,15 +18,15 @@ class Principal:
         self.weights = []
         self.distances = dict()
         self.neighbors = [list() for _ in range(self.population_size)]
-        self.obj = zdt3.zdt3()
-        self.best = [np.infty for _ in range(self.obj.number_obj)]
+        #self.obj = zdt3.zdt3()
+        self.best = [np.infty for _ in range(zdt3.number_obj)]
         self.end_gen = bol_gen #Se ha acabado con todas las gen?
         self.bol_gen = [] #Lista con todas las gen
 
 
     def first(self):
         #self.population = [np.random.uniform(0, 1)] generalicemos
-        self.population = [[np.random.uniform(self.obj.min_realvar[i], self.obj.max_realvar[i])
+        self.population = [[np.random.uniform(zdt3.min_realvar[i], zdt3.max_realvar[i])
             for i in range(30)]
             for _ in range(self.population_size)]  #Generalizar el 30?
 
@@ -42,8 +42,8 @@ class Principal:
                           for x, y in itertools.product(
                             list(range(len(self.weights))), repeat=2)}
 
-        self.best = [np.min([self.obj.solution(individual)[i] for individual in self.population])
-                     for i in range(self.obj.number_obj)]
+        self.best = [np.min([zdt3.solution(individual)[i] for individual in self.population])
+                     for i in range(zdt3.number_obj)]
 
         self.born = True
 
@@ -55,7 +55,7 @@ class Principal:
             for i in range(self.population_size):
                 if self.reproduce(i) != -1: #Reproduccion
                     obj = self.evaluate(self.population[i]) #Evaluacion
-                    for j in range(self.obj.number_obj): #Actualizar z
+                    for j in range(zdt3.number_obj): #Actualizar z
                         if self.best[j] > obj[j]:
                             self.best[j] = obj[j]
                     #tchebycheff_son = max([self.weights[i][j] * np.abs(
@@ -65,10 +65,10 @@ class Principal:
                         obj_neighbor = self.evaluate(self.population[j])
                         tchebycheff_son = max([self.weights[j][k] * np.abs(
                           obj[k] - self.best[k])
-                          for k in range(self.obj.number_obj)])
+                          for k in range(zdt3.number_obj)])
                         tchebycheff_neighbor = max([self.weights[j][k] * np.abs(
                             obj_neighbor[k] - self.best[k])
-                            for k in range(self.obj.number_obj)])
+                            for k in range(zdt3.number_obj)])
                         if tchebycheff_son <= tchebycheff_neighbor:
                             self.population[j] = copy.copy(self.population[i])
             if self.end_gen:
@@ -106,10 +106,10 @@ class Principal:
         print('Tamaño hijo: ')
         print(len(son))'''
         for i in range(len(son)):
-            if son[i] < self.obj.min_realvar[i]:
-                son[i] = self.obj.min_realvar[i]
-            elif son[i] > self.obj.max_realvar[i]:
-                son[i] = self.obj.max_realvar[i]
+            if son[i] < zdt3.min_realvar[i]:
+                son[i] = zdt3.min_realvar[i]
+            elif son[i] > zdt3.max_realvar[i]:
+                son[i] = zdt3.max_realvar[i]
         for i in range(len(son)):
             if np.random.random() < self.cr:
                 son[i] = self.population[individual][i]
@@ -117,4 +117,4 @@ class Principal:
         return individual
 
     def evaluate(self, individual):
-        return self.obj.solution(individual)
+        return zdt3.solution(individual)

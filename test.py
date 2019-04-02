@@ -16,7 +16,7 @@ def last_gen_obj(moec):
     with open('tests/last_gen_obj_moec_' + str(moec.population_size) + '_'
               + str(moec.generations) + '.out', 'w') as f:
         for i in range(moec.population_size):
-            obj = zdt3.zdt3().solution(moec.population[i])
+            obj = zdt3.solution(moec.population[i])
             f.write('{:.6e}'.format(obj[0]) + '\t'
                     + '{:.6e}'.format(obj[1]) + '\n')
 
@@ -24,7 +24,7 @@ def all_gen_obj(moec):
     with open('tests/all_gen_obj_moec_' + str(moec.population_size) + '_'
               + str(moec.generations) + '.out', 'w') as f:
         for i in range(len(moec.bol_gen)):
-            obj = zdt3.zdt3().solution(moec.bol_gen[i])
+            obj = zdt3.solution(moec.bol_gen[i])
             f.write('{:.6e}'.format(obj[0]) + '\t'
                     + '{:.6e}'.format(obj[1]) + '\n')
 
@@ -32,7 +32,7 @@ def all_gen_obj(moec):
 def test():
     m = Principal.Principal()
     m.process()
-    values = np.array([zdt3.zdt3().solution(m.population[j])
+    values = np.array([zdt3.solution(m.population[j])
                        for j in range(m.population_size)])
     x, y = values.T
     plt.scatter(x, y)
