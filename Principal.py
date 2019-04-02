@@ -8,9 +8,10 @@ class Principal:
     def __init__(self, populat=100, generat=100, bol_gen=False):
         self.population_size = populat
         self.generations = generat
-        self.neighborhood_size = 0.2 #Probar con 0.3
+        self.neighborhood_size = 0.3 #Probar con 0.3
         self.sig = 20 #SIG para desviación estandar
-        self.pr = 0.5 #Operador de mutación gaussiana
+        self.p = len(zdt3.min_realvar)
+        self.pr = (1/self.p) #Operador de mutación gaussiana
         self.f = 0.5 #mutación
         self.cr = 0.5 #cruce
         self.born = False #Para saber si es la primera
@@ -24,10 +25,10 @@ class Principal:
         self.bol_gen = [] #Lista con todas las gen
 
 
-    def first(self):
+    def first(self): #Initialization
         #self.population = [np.random.uniform(0, 1)] generalicemos
         self.population = [[np.random.uniform(zdt3.min_realvar[i], zdt3.max_realvar[i])
-            for i in range(30)]
+            for i in range(self.p)]
             for _ in range(self.population_size)]  #Generalizar el 30?
 
         #self.weights = np.random.dirichlet(
@@ -50,7 +51,7 @@ class Principal:
         self.compute_neighbors()
 
     def process(self):
-        self.first() #Hemos de iniciar con una primera población y datos
+        self.first() #We have to initialize with a first population
         for generation in range(self.generations):
             for i in range(self.population_size):
                 if self.reproduce(i) != -1: #Reproduccion
@@ -106,13 +107,20 @@ class Principal:
         print('Tamaño hijo: ')
         print(len(son))'''
         for i in range(len(son)):
+            if np.random.random() < self.cr:
+                son[i] = self.population[individual][i]
+        ## Gaussian Mutation##
+        for i in range(len(son)):
+            if np.random.random() < self.pr:
+                sigma = (zdt3.max_realvar[i] - zdt3.min_realvar[i])/self.sig
+                son[i] = son[i] + np.random.normal(0, sigma)
+        #Dentro del dominio?
+        for i in range(len(son)):
             if son[i] < zdt3.min_realvar[i]:
                 son[i] = zdt3.min_realvar[i]
             elif son[i] > zdt3.max_realvar[i]:
                 son[i] = zdt3.max_realvar[i]
-        for i in range(len(son)):
-            if np.random.random() < self.cr:
-                son[i] = self.population[individual][i]
+
         self.population[individual] = copy.copy(np.ndarray.tolist(son))
         return individual
 
