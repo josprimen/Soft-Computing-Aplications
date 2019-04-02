@@ -23,7 +23,7 @@ class testeo():
         return program
 
     def last_gen_obj(self, program):
-        with open('tests/last_gen_obj_moec_' + str(program.population_size) + '_'
+        with open('results/last_gen_obj_moec_' + str(program.population_size) + '_'
                   + str(program.generations) + '.out', 'w') as f:
             for i in range(program.population_size):
                 obj = zdt3.zdt3().solution(program.population[i])
@@ -31,7 +31,7 @@ class testeo():
                         + '{:.6e}'.format(obj[1]) + '\n')
 
     def all_gen_obj(self, program):
-        with open('tests/all_gen_obj_moec_' + str(program.population_size) + '_'
+        with open('results/all_gen_obj_moec_' + str(program.population_size) + '_'
                   + str(program.generations) + '.out', 'w') as f:
             for i in range(len(program.list_all_gen)):
                 obj = zdt3.zdt3().solution(program.list_all_gen[i])

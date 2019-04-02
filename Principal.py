@@ -14,30 +14,33 @@ class Principal:
         self.f = 0.5 #mutación
         self.cr = 0.5 #cruce
         self.born = False #Para saber si es la primera
-        self.end_gen = bol_gen #Se ha acabado con todas las gen?
         self.population = []
         self.weights = []
         self.distances = dict()
         self.neighbors = [list() for _ in range(self.population_size)]
         self.obj = zdt3.zdt3()
         self.best = [np.infty for _ in range(self.obj.number_obj)]
-        self.list_all_gen = [] #Lista con todas las gen
+        self.end_gen = bol_gen #Se ha acabado con todas las gen?
+        self.bol_gen = [] #Lista con todas las gen
+
 
     def first(self):
         #self.population = [np.random.uniform(0, 1)] generalicemos
         self.population = [[np.random.uniform(self.obj.min_realvar[i], self.obj.max_realvar[i])
-            for i in range(30)] for _ in range(self.population_size)]  #Generalizar el 30?
+            for i in range(30)]
+            for _ in range(self.population_size)]  #Generalizar el 30?
 
         #self.weights = np.random.dirichlet(
          #   np.ones(self.obj.number_obj), self.population_size)
         #La suma de los componentes de cada vector es 1 y vectores distribuidos uniformemente
         self.weights = np.asarray(
             [[(self.population_size-i)/self.population_size,
-              1.-((self.population_size-i)/self.population_size)]
-             for i in range(self.population_size)])
+            1.-((self.population_size-i)/self.population_size)]
+            for i in range(self.population_size)])
 
         self.distances = {(x, y): np.linalg.norm(self.weights[x]-self.weights[y])
-                          for x, y in itertools.product(list(range(len(self.weights))), repeat=2)}
+                          for x, y in itertools.product(
+                            list(range(len(self.weights))), repeat=2)}
 
         self.best = [np.min([self.obj.solution(individual)[i] for individual in self.population])
                      for i in range(self.obj.number_obj)]
@@ -70,7 +73,7 @@ class Principal:
                             self.population[j] = copy.copy(self.population[i])
             if self.end_gen:
                 for i in range(self.population_size):
-                    self.list_all_gen.append(self.population[i])
+                    self.bol_gen.append(self.population[i])
 
     def compute_neighbors(self):
         for i in range(self.population_size):
