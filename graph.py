@@ -15,11 +15,14 @@ class testeo():
         plt.show()
         return program
 
+    #grafica.test_moec(100, 100, False) -> sin primera generacion
+    #grafica.test_moec(100, 100, True) -> con primera generación (no fallos)
     def test_moec(self, p_size, n_gen, all_gen):
         m = Principal.Principal(p_size, n_gen, all_gen)
         m.process()
         self.last_gen_obj(m)
         self.all_gen_obj(m)
+        self.first_gen_obj(m)
         return m
 
     def last_gen_obj(self, moec):
@@ -41,7 +44,11 @@ class testeo():
     def first_gen_obj(self, moec):
         with open('results/first_gen_obj_moec_' + str(moec.population_size) + '_'
                   + str(moec.generations) + '.out', 'w') as f:
+            '''print('Tamaño de la poblacion')
+            print(moec.population_size)'''
             for i in range(moec.population_size):
+                '''print('Cosa')
+                print(moec.bol_gen[i])'''
                 obj = zdt3.solution(moec.bol_gen[i])
                 f.write('{:.6e}'.format(obj[0]) + '\t'
                         + '{:.6e}'.format(obj[1]) + '\n')
