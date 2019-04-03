@@ -2,15 +2,21 @@ import numpy as np
 import itertools
 import zdt3
 import copy
+import cf6
 
 class Principal:
 
-    def __init__(self, populat=100, generat=100, bol_gen=False):
+    def __init__(self, populat, generat, constr, bol_gen):
+        self.constr = constr
+        if self.constr:
+            self.problem = cf6
+        else:
+            self.problem = zdt3
         self.population_size = populat
         self.generations = generat
         self.neighborhood_size = 0.3 #Probar con 0.3
         self.sig = 20 #SIG para desviación estandar
-        self.p = len(zdt3.min_realvar)
+        self.p = len(self.problem.min_realvar)
         self.pr = (1/self.p) #Operador de mutación gaussiana
         self.f = 0.5 #mutación
         self.cr = 0.5 #cruce
@@ -20,14 +26,14 @@ class Principal:
         self.distances = dict()
         self.neighbors = [list() for _ in range(self.population_size)]
         #self.obj = zdt3.zdt3()
-        self.best = [np.infty for _ in range(zdt3.number_obj)]
+        self.best = [np.infty for _ in range(self.problem.number_obj)]
         self.end_gen = bol_gen #Se ha acabado con todas las gen?
         self.bol_gen = [] #Lista con todas las gen
 
 
     def first(self): #Initialization
         #self.population = [np.random.uniform(0, 1)] generalicemos
-        self.population = [[np.random.uniform(zdt3.min_realvar[i], zdt3.max_realvar[i])
+        self.population = [[np.random.uniform(self.problem.min_realvar[i], self.problem.max_realvar[i])
             for i in range(self.p)]
             for _ in range(self.population_size)]  #Generalizar el 30?
 
@@ -43,8 +49,8 @@ class Principal:
                           for x, y in itertools.product(
                             list(range(len(self.weights))), repeat=2)}
 
-        self.best = [np.min([zdt3.solution(individual)[i] for individual in self.population])
-                     for i in range(zdt3.number_obj)]
+        self.best = [np.min([self.evaluate(individual)[i] for individual in self.population])
+                     for i in range(self.problem.number_obj)]
 
         self.born = True
 
@@ -56,7 +62,7 @@ class Principal:
             for i in range(self.population_size):
                 if self.reproduce(i) != -1: #Reproduccion
                     obj = self.evaluate(self.population[i]) #Evaluacion
-                    for j in range(zdt3.number_obj): #Actualizar z
+                    for j in range(self.problem.number_obj): #Actualizar z
                         if self.best[j] > obj[j]:
                             self.best[j] = obj[j]
                     #tchebycheff_son = max([self.weights[i][j] * np.abs(
@@ -66,10 +72,10 @@ class Principal:
                         obj_neighbor = self.evaluate(self.population[j])
                         tchebycheff_son = max([self.weights[j][k] * np.abs(
                           obj[k] - self.best[k])
-                          for k in range(zdt3.number_obj)])
+                          for k in range(self.problem.number_obj)])
                         tchebycheff_neighbor = max([self.weights[j][k] * np.abs(
                             obj_neighbor[k] - self.best[k])
-                            for k in range(zdt3.number_obj)])
+                            for k in range(self.problem.number_obj)])
                         if tchebycheff_son <= tchebycheff_neighbor:
                             self.population[j] = copy.copy(self.population[i])
             if self.end_gen:
@@ -112,17 +118,20 @@ class Principal:
         ## Gaussian Mutation##
         for i in range(len(son)):
             if np.random.random() < self.pr:
-                sigma = (zdt3.max_realvar[i] - zdt3.min_realvar[i])/self.sig
+                sigma = (self.problem.max_realvar[i] - self.problem.min_realvar[i])/self.sig
                 son[i] = son[i] + np.random.normal(0, sigma)
         #Dentro del dominio?
         for i in range(len(son)):
-            if son[i] < zdt3.min_realvar[i]:
-                son[i] = zdt3.min_realvar[i]
-            elif son[i] > zdt3.max_realvar[i]:
-                son[i] = zdt3.max_realvar[i]
+            if son[i] < self.problem.min_realvar[i]:
+                son[i] = self.problem.min_realvar[i]
+            elif son[i] > self.problem.max_realvar[i]:
+                son[i] = self.problem.max_realvar[i]
 
         self.population[individual] = copy.copy(np.ndarray.tolist(son))
         return individual
 
     def evaluate(self, individual):
+        if self.constr:
+            (v, c) = cf6.solution(individual)
+            return [v[j]+0.1*c[j] for j in range(cf6.number_obj)]
         return zdt3.solution(individual)

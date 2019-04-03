@@ -2,28 +2,47 @@ import Principal
 import numpy as np
 import matplotlib.pyplot as plt
 import zdt3
+import cf6
 
 class testeo():
 
-    def test(self):
-        program = Principal.Principal()
-        program.process()
-        values = np.array([zdt3.solution(program.population[j])
+    def test(self, p_size, n_gen, constr, all_gen):
+        if constr:
+            program = Principal.Principal(p_size, n_gen, constr, all_gen)
+            program.process()
+            values = np.array([cf6.solution(program.population[j])
+                               for j in range(program.population_size)])
+            x, y = values.T
+            plt.scatter(x, y)
+            plt.show()
+            return program
+        else:
+            program = Principal.Principal(p_size, n_gen, constr, all_gen)
+            program.process()
+            values = np.array([zdt3.solution(program.population[j])
                            for j in range(program.population_size)])
-        x, y = values.T
-        plt.scatter(x, y)
-        plt.show()
-        return program
+            x, y = values.T
+            plt.scatter(x, y)
+            plt.show()
+            return program
 
+    #Imprimir los datos
     #grafica.test_moec(100, 100, False) -> sin primera generacion
     #grafica.test_moec(100, 100, True) -> con primera generación (no fallos)
-    def test_moec(self, p_size, n_gen, all_gen):
+
+    #Imprimir las graficas
+    #grafica.test(100,100,True,False) -> ultimo parametro irrelevante
+    def test_moec(self, p_size, n_gen, constr, all_gen):
         m = Principal.Principal(p_size, n_gen, all_gen)
         m.process()
-        self.last_gen_obj(m)
-        self.all_gen_obj(m)
-        self.first_gen_obj(m)
-        return m
+        if constr:
+            self.last_gen_obj_c(m)
+            self.all_gen_obj_c(m)
+        else:
+            self.last_gen_obj(m)
+            self.all_gen_obj(m)
+            self.first_gen_obj(m)
+            return m
 
     def last_gen_obj(self, moec):
         with open('results/last_gen_obj_moec_' + str(moec.population_size) + '_'
@@ -50,5 +69,23 @@ class testeo():
                 '''print('Cosa')
                 print(moec.bol_gen[i])'''
                 obj = zdt3.solution(moec.bol_gen[i])
+                f.write('{:.6e}'.format(obj[0]) + '\t'
+                        + '{:.6e}'.format(obj[1]) + '\n')
+
+    def last_gen_obj_c(self, moec):
+        with open('results/last_gen_obj_cmoec_' + str(moec.population_size) + '_'
+                  + str(moec.generations) + '.out', 'w') as f:
+            for i in range(moec.population_size):
+                (v, c) = cf6.solution(moec.population[i])
+                obj = [v[j] + c[j] for j in range(cf6.number_obj)]
+                f.write('{:.6e}'.format(obj[0]) + '\t'
+                        + '{:.6e}'.format(obj[1]) + '\n')
+
+    def all_gen_obj_c(self, moec):
+        with open('results/all_gen_obj_cmoec_' + str(moec.population_size) + '_'
+                  + str(moec.generations) + '.out', 'w') as f:
+            for i in range(len(moec.bol_gen)):
+                (v, c) = cf6.solution(moec.bol_gen[i])
+                obj = [v[j] + c[j] for j in range(cf6.number_obj)]
                 f.write('{:.6e}'.format(obj[0]) + '\t'
                         + '{:.6e}'.format(obj[1]) + '\n')
