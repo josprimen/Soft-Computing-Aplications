@@ -27,8 +27,8 @@ class Principal:
         self.neighbors = [list() for _ in range(self.population_size)]
         #self.obj = zdt3.zdt3()
         self.best = [np.infty for _ in range(self.problem.number_obj)]
-        self.end_gen = bol_gen #Se ha acabado con todas las gen?
-        self.bol_gen = [] #Lista con todas las gen
+        self.end_gen = bol_gen
+        self.bol_gen = [] #Lista con la gen
 
 
     def first(self): #Initialization
