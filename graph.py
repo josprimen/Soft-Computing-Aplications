@@ -26,14 +26,21 @@ class testeo():
             plt.show()
             return program
 
+    #Inicialización grafica = testeo()
+
     #Imprimir los datos
-    #grafica.test_moec(100, 100, False) -> sin primera generacion
-    #grafica.test_moec(100, 100, True) -> con primera generación (no fallos)
+    #grafica.test_moec(100, 100, False, False) -> sin primera generacion zdt3
+    #grafica.test_moec(100, 100, True, False) -> sin primera generacion cf6
+    #grafica.test_moec(100, 100, False, True) -> con primera generación (no fallos) zdt3
+    #grafica.test_moec(100, 100, True, True) -> con primera generación (no fallos) cf6
+
 
     #Imprimir las graficas
-    #grafica.test(100,100,True,False) -> ultimo parametro irrelevante
+    #grafica.test(100,100,False,False) -> ultimo parametro irrelevante zdt3
+    #grafica.test(100,100,True,False) -> ultimo parametro irrelevante cf6
+
     def test_moec(self, p_size, n_gen, constr, all_gen):
-        m = Principal.Principal(p_size, n_gen, all_gen)
+        m = Principal.Principal(p_size, n_gen, constr, all_gen)
         m.process()
         if constr:
             self.last_gen_obj_c(m)
