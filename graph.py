@@ -8,21 +8,35 @@ class testeo():
 
     def test(self, p_size, n_gen, constr, all_gen):
         if constr:
+            f = open("PF.dat", "r")
+            a, b = [], []
+            for line in f:
+                a1, a2 = line.strip().split("\t")
+                a.append(float(a1))
+                b.append(float(a2))
             program = Principal.Principal(p_size, n_gen, constr, all_gen)
             program.process()
             values = np.array([cf6.solution(program.population[j])
                                for j in range(program.population_size)])
             x, y = values.T
             plt.scatter(x, y)
+            plt.scatter(a, b, c="red", alpha=0.05)
             plt.show()
             return program
         else:
+            f = open("frente.dat", "r")
+            a, b = [], []
+            for line in f:
+                a1, a2 = line.strip().split("\t")
+                a.append(float(a1))
+                b.append(float(a2))
             program = Principal.Principal(p_size, n_gen, constr, all_gen)
             program.process()
             values = np.array([zdt3.solution(program.population[j])
                            for j in range(program.population_size)])
             x, y = values.T
             plt.scatter(x, y)
+            plt.scatter(a, b, c="red", alpha=0.1)
             plt.show()
             return program
 

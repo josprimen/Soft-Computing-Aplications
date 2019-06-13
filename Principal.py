@@ -27,8 +27,8 @@ class Principal:
         self.neighbors = [list() for _ in range(self.population_size)]
         #self.obj = zdt3.zdt3()
         self.best = [np.infty for _ in range(self.problem.number_obj)]
-        self.end_gen = bol_gen #Se ha acabado con todas las gen?
-        self.bol_gen = [] #Lista con todas las gen
+        self.end_gen = bol_gen
+        self.bol_gen = [] #Lista población
 
 
     def first(self): #Initialization
@@ -119,6 +119,7 @@ class Principal:
         for i in range(len(son)):
             if np.random.random() < self.pr:
                 sigma = (self.problem.max_realvar[i] - self.problem.min_realvar[i])/self.sig
+                #print(sigma)
                 son[i] = son[i] + np.random.normal(0, sigma)
         #Dentro del dominio?
         for i in range(len(son)):
@@ -133,5 +134,9 @@ class Principal:
     def evaluate(self, individual):
         if self.constr:
             (v, c) = cf6.solution(individual)
-            return [v[j]+0.1*c[j] for j in range(cf6.number_obj)]
+            #print('fantasia' + str(c))
+            #print([v[j]+0.1*c[j] for j in range(cf6.number_obj)])
+            if (c[0]<0 or c[1]<0): return [v[j]+0.1*c[j] for j in range(cf6.number_obj)]
+            else: return [v[j] for j in range(cf6.number_obj)]
+            #return [v[j]+0.1*c[j] for j in range(cf6.number_obj)]
         return zdt3.solution(individual)
