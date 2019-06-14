@@ -3,6 +3,7 @@ import itertools
 import zdt3
 import copy
 import cf6
+import math
 
 class Principal:
 
@@ -15,10 +16,10 @@ class Principal:
         self.population_size = populat
         self.generations = generat
         self.neighborhood_size = 0.3 #Probar con 0.3
-        self.sig = 20 #SIG para desviación estandar
+        self.sig = 80 #SIG para desviación estandar
         self.p = len(self.problem.min_realvar)
         self.pr = (1/self.p) #Operador de mutación gaussiana
-        self.f = 0.5 #mutación
+        self.f = 0.8 #mutación
         self.cr = 0.5 #cruce
         self.born = False #Para saber si es la primera
         self.population = []
@@ -136,7 +137,7 @@ class Principal:
             (v, c) = cf6.solution(individual)
             #print('fantasia' + str(c))
             #print([v[j]+0.1*c[j] for j in range(cf6.number_obj)])
-            if (c[0]<0 or c[1]<0): return [v[j]+0.1*c[j] for j in range(cf6.number_obj)]
+            if (c[0]<0 or c[1]<0): return [v[j]+50 * math.fabs(c[j]) for j in range(cf6.number_obj)]
             else: return [v[j] for j in range(cf6.number_obj)]
             #return [v[j]+0.1*c[j] for j in range(cf6.number_obj)]
         return zdt3.solution(individual)
